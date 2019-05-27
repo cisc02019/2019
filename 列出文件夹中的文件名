@@ -1,0 +1,13 @@
+import os
+path = r'D:\soft'
+outfile = r'd:\code\TitleCodes.txt'
+
+f = open(outfile,"w")
+for dirpath,dirnames,filenames in os.walk(path):
+    for filename in filenames:
+        a = os.path.join(dirpath,filename)
+        print(a)
+        f.write(a)
+        f.write('\n')
+
+f.close()
