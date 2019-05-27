@@ -1,0 +1,81 @@
+#-*- coding:utf-8 -*-
+import requests
+import re
+import time
+from bs4 import BeautifulSoup
+import os
+
+
+url_start = 'https://XXX.com.htm'
+url_end = 'https://XXX.com.htm'
+
+# 获取图片链接并保存到文件夹的函数
+def getIMG(article_url):
+    # time.sleep(1)
+    urls = []
+    try:
+        html = requests.get(article_url)
+        html.encoding = 'utf-8'
+        soup = BeautifulSoup(html.text, 'html.parser')
+        #img = re.findall('<img src="(.+?\.jpg)"',req.text,re.S)
+        #part_picURL = re.findall("src='http://img(.+?\.jpg)'",html.text,re.S)
+
+        part_picURL = re.findall('<img src="(.+?\.jpg)"', html.text, re.S)
+        for each in part_picURL:
+            #picURL = 'http://img' + each
+            #print each
+            picURL = each
+            urls.append(picURL)
+        i=0
+        for each in urls:
+            try:
+                pic = requests.get(each, timeout = 10)
+                folder_name = soup.select('title')[0].text
+                if os.path.isdir(folder_name):
+                    pass
+                else:
+                    os.mkdir(folder_name)
+                    print('文件夹'+ '$ ' + folder_name + '$' + '创建完成')
+                file_name = folder_name+'/' + folder_name + str(i) + '.jpg'
+                fp = open(file_name,'wb')
+                fp.write(pic.content)
+                fp.close()
+                i += 1
+            except:
+                pass
+        print('图片下载完成')
+    except:
+        pass
+    return urls
+
+url_list = []
+#获取当前页面文章列表链接并翻页
+def getlist(url_Start):
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'}
+    req = requests.get(url_Start)
+    req.encoding = 'gbk'
+    url_index = re.findall('href="/htm/pic1/(.+?\.htm)" target="_blank">', req.text, re.S)
+    for p in url_index:
+        full_url = 'https://www.971cf.com/htm/pic1/' + p
+        url_list.append(full_url)
+    #判断是否要翻页
+        urls_next = re.findall('</a><a href="/htm/piclist1/(.+?\.htm)" target="_parent">', req.text, re.S)[1]
+    url_next = 'https://XXX.com.htm' + urls_next
+    print url_next
+    if url_next != url_end:
+        getlist(url_next)
+    else:
+        print('已到达末页')
+    return url_list
+
+
+
+if __name__ == '__main__':
+    lists = getlist(url_start)
+    print(len(lists))
+    for list in lists:
+        print list
+        img = getIMG(list)
+        print(img)
+    #url1 = 'https://XXX.com.htm'
+    #getIMG(url1)
