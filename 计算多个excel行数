@@ -1,0 +1,38 @@
+import xlrd
+import csv
+import os
+import xlwt
+import sys
+from datetime import date, datetime
+
+
+def GetFileFromThisRootDir(dir,ext = None):
+  allfiles = []
+  needExtFilter = (ext != None)
+  for root,dirs,files in os.walk(dir):
+    for filespath in files:
+      filepath = os.path.join(root, filespath)
+      extension = os.path.splitext(filepath)[1][1:]
+      if needExtFilter and extension in ext:
+        allfiles.append(filepath)
+      elif not needExtFilter:
+        allfiles.append(filepath)
+  return allfiles
+
+
+if __name__ == '__main__':
+    path = "c:\\00"
+    filelist = GetFileFromThisRootDir(path,'xlsx')
+
+    for filename in filelist:
+       data = xlrd.open_workbook(filename)
+       table = data.sheets()[0]
+
+
+       print filename,table.nrows
+
+    filelist = GetFileFromThisRootDir(path, 'csv')
+    for filename in filelist:
+        a = open(filename, "r")
+        num = len(a.readlines())
+        print filename,num
