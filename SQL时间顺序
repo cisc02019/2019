@@ -1,0 +1,5 @@
+SELECT  XXX
+FROM    XXX 
+AND 
+substr(gmtcreate,1,10)>='2019-04-01'
+and substr(gmtcreate,1,10)<='2019-06-10'
